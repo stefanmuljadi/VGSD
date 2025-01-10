@@ -7,7 +7,6 @@ try:
 except ImportError:
     from DeepLabV3 import DeepLabV3
 import os 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 from einops import rearrange
 
 
@@ -81,9 +80,9 @@ class VGD_Network(nn.Module):
         exemplar_pre = self.final_pre(fuse_exemplar)
         query_pre = self.final_pre(fuse_query)
         other_pre = self.final_pre(fuse_other)  # 304 -> 256 
-        exemplar_pre = F.upsample(exemplar_pre, input_size, mode='bilinear', align_corners=False) 
-        query_pre = F.upsample(query_pre, input_size, mode='bilinear', align_corners=False) 
-        other_pre = F.upsample(other_pre, input_size, mode='bilinear', align_corners=False) 
+        exemplar_pre = F.interpolate(exemplar_pre, input_size, mode='bilinear', align_corners=False) 
+        query_pre = F.interpolate(query_pre, input_size, mode='bilinear', align_corners=False) 
+        other_pre = F.interpolate(other_pre, input_size, mode='bilinear', align_corners=False) 
         
         # # ###### generate reflection
         exp_hx5 = self.refine_encoder1(exemplar0, exemplar, input1, exemplar_pre)
@@ -485,6 +484,5 @@ if __name__ == '__main__':
     other = torch.rand(2, 3, 416, 416).cuda() 
     # , examplar_final, query_final, other_final
     exemplar_pre, query_pre, other_pre = model(exemplar, query, other)
-    print(exemplar_pre.shape)
     print(query_pre.shape)
 

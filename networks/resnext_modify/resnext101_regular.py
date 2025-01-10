@@ -14,7 +14,7 @@ class ResNeXt101(nn.Module):
             # pass 
             print('Load pretrained ResNeXt101 !!!!!!', resnext_101_32_path)
             try:
-                msg = net.load_state_dict(torch.load(resnext_101_32_path))
+                msg = net.load_state_dict(torch.load(resnext_101_32_path, weights_only=True))
             except FileNotFoundError:
                 msg = net.load_state_dict(torch.load('../' + resnext_101_32_path))
             print(msg)

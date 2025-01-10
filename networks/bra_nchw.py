@@ -252,7 +252,7 @@ def regional_routing_attention_torch(
     return output, attn
 
 
-from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from timm.layers import DropPath, to_2tuple, trunc_normal_
 class deform_Block(nn.Module):
     def __init__(self, dim, drop_path=0., layer_scale_init_value=-1,
                        num_heads=8, n_win=7, qk_dim=None, qk_scale=None,

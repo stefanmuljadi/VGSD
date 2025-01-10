@@ -1,23 +1,20 @@
 import numpy as np
 import os
-
 import torch
 from PIL import Image
 from torchvision import transforms
 from skimage import io
 from config import ViSha_test_root
 from misc import check_mkdir
-
 from networks.VGD_reflection import VGD_Network 
 
 from dataset.VSshadow_ours import listdirs_only
 import argparse
 from tqdm import tqdm
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = {
-    'scale': 416,
+    'scale': 256,
     'test_adjacent': 1,
     'input_folder': 'JPEGImages',
     'label_folder': 'SegmentationClassPNG'
@@ -31,15 +28,10 @@ img_transform = transforms.Compose([
 target_transform = transforms.ToTensor()
 
 root = ViSha_test_root[0]
-print('root: ', root)
 
 to_pil = transforms.ToPILImage()
-
-import pdb 
-parser = argparse.ArgumentParser()
-parser.add_argument("-pred", "--prediction", type=str, default=None)  #results/
-parser.add_argument("-exp", "--exp", type=str, default="VMD_ours")
-args = parser.parse_args()
+prediction_path = "../results/"
+model_path = "../checkpoints/VGSD.pth"
 
 def save_reflection(image_name, pred, d_dir, size):
     predict = pred
@@ -52,29 +44,23 @@ def save_reflection(image_name, pred, d_dir, size):
     imo = im.resize(size, resample=Image.BILINEAR)
 
     imo.save(os.path.join(d_dir, image_name + '.png'))
+    print(os.path.join(d_dir, image_name + '.png'))
 
 
 def main():
     net = VGD_Network().cuda()
-
-    print(args.prediction)
-    print(args.exp)
-
-    # checkpoint = os.path.join(args.exp, 'best.pth')
-    checkpoint = args.exp 
-    print(checkpoint)
-    check_point = torch.load(checkpoint)
+    check_point = torch.load(model_path, weights_only=True)
     msg = net.load_state_dict(check_point['model'], strict=False)
-    print(msg)
 
     import time 
     all_time = 0
     index = 0
 
     net.eval()
+    start = time.time()
+
     with torch.no_grad():
         video_list = listdirs_only(os.path.join(root))
-        # print(video_list)
         video_list = sorted(video_list)
         for video in tqdm(video_list):
             # all images
@@ -95,26 +81,22 @@ def main():
                     query = Image.open(os.path.join(root, video, config['input_folder'], img_list[query_idx] + '.jpg')).convert('RGB')
                     exemplar_tensor = img_transform(exemplar).unsqueeze(0).cuda()
                     query_tensor = img_transform(query).unsqueeze(0).cuda()
-                    start = time.time()
                     exemplar_final, exemplar_ref, exemplar_pre = net(exemplar_tensor, query_tensor, query_tensor)
                     all_time += time.time() - start 
-
-                    # exemplar_final = exemplar_pre  #### NOTE
-
+                    print(f"Time: {all_time}")
                     res = (exemplar_final.data > 0).to(torch.float32).squeeze(0)
-                    # res = torch.sigmoid(exemplar_final.squeeze())
-                    prediction = np.array(
-                        transforms.Resize((h, w))(to_pil(res.cpu())))
+                    prediction = np.array(transforms.Resize((h, w))(to_pil(res.cpu())))
 
-                    check_mkdir(os.path.join(args.prediction, 'pred', video))
+                    check_mkdir(os.path.join(prediction_path, 'pred', video))
                     save_name = f"{exemplar_name}.png"
-                    Image.fromarray(prediction).save(os.path.join(args.prediction, 'pred', video, save_name))
+                    Image.fromarray(prediction).save(os.path.join(prediction_path, 'pred', video, save_name))
+                    print(os.path.join(prediction_path, 'pred', video, save_name))
 
-                    # print(os.path.join(args.prediction, 'reflection', video), '---')
+                    # print(os.path.join(prediction_path, 'reflection', video), '---')
 
                     # # ## save reflection 
-                    # check_mkdir(os.path.join(args.prediction, 'reflection', video))
-                    # save_reflection(exemplar_name, exemplar_ref, os.path.join(args.prediction, 'reflection', video), (w, h))
+                    # check_mkdir(os.path.join(prediction_path, 'reflection', video))
+                    # save_reflection(exemplar_name, exemplar_ref, os.path.join(prediction_path, 'reflection', video), (w, h))
 
 
 
