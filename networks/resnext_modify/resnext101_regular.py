@@ -1,6 +1,7 @@
 import torch
 from torch import nn
-
+from google.colab import drive
+drive.mount('/content/drive')
 from .config import resnext_101_32_path
 from .resnext_101_32x4d_ import resnext_101_32x4d
 import torch._utils
