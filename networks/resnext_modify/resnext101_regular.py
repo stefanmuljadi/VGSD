@@ -12,10 +12,12 @@ class ResNeXt101(nn.Module):
         net = resnext_101_32x4d
         if pretained:
             # pass 
-            print('Load pretrained ResNeXt101 !!!!!!', resnext_101_32_path)
+            print('Load pretrained ResNeXt101 AAAAAA !!!!!!', './resnext_101_32x4d.pth')
             try:
-                msg = net.load_state_dict(torch.load(resnext_101_32_path, weights_only=True))
+                print("a")
+                msg = net.load_state_dict(torch.load('./resnext_101_32x4d.pth', weights_only=True))
             except FileNotFoundError:
+                print("e")
                 msg = net.load_state_dict(torch.load('../' + resnext_101_32_path))
             print(msg)
         net = list(net.children())
