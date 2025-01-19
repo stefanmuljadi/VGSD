@@ -15,11 +15,11 @@ class ResNeXt101(nn.Module):
             print('AAAAAA !!!!!!', '/content/VGSD/networks/resnext_modify/resnext_101_32x4d.pth')
             try:
                 print("a")
-                msg = net.load_state_dict(torch.load('/content/VGSD/networks/resnext_modify/resnext_101_32x4d.pth', weights_only=True))
+                msg = net.load_state_dict(torch.load('/content/resnext_101_32x4d.pth', weights_only=True))
             except FileNotFoundError:
                 print("e")
                 print()
-                msg = net.load_state_dict(torch.load('../' + resnext_101_32_path))
+                msg = net.load_state_dict(torch.load('../' + "/content/resnext_101_32x4d.pth"))
             print(msg)
         net = list(net.children())
         self.layer0 = nn.Sequential(*net[:3])
