@@ -16,7 +16,7 @@ class ResNeXt101(nn.Module):
             print('AAAAAA !!!!!!', '/content/VGSD/networks/resnext_modify/resnext_101_32x4d.pth')
             try:
                 print("a")
-                msg = net.load_state_dict(torch.load('/content/gdrive/MyDrive/FYP/resnext_101_32x4d.pth', weights_only=False))
+                msg = net.load_state_dict(torch.load('/content/gdrive/MyDrive/FYP/resnext_101_32x4d.pth', weights_only=True))
             except FileNotFoundError:
                 print("e")
                 print()
