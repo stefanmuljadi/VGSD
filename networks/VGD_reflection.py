@@ -131,7 +131,7 @@ class RefNet_encoder(nn.Module):
 
         self.conv0_1 = nn.Conv2d(in_ch, inc_ch, 3, padding=1)
 
-        from networks.bra_nchw import deform_Block 
+        from .bra_nchw import deform_Block 
         self.deform1 = deform_Block(dim=inc_ch, num_heads=1)
         self.deform2 = deform_Block(dim=inc_ch, num_heads=1)
         self.deform3 = deform_Block(dim=inc_ch, num_heads=1)

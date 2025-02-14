@@ -10,10 +10,10 @@ except ImportError:
 class DeepLabV3(nn.Module):
     def __init__(self, num_classes=1, pretrained=True):
         super(DeepLabV3, self).__init__()
-        if self.training:
-            self.backbone = resnext101_regular.ResNeXt101(pretrained)
-        else:
-            self.backbone = resnext101_regular.ResNeXt101(False)
+        # if self.training:
+        #     self.backbone = resnext101_regular.ResNeXt101(pretrained)
+        # else:
+        self.backbone = resnext101_regular.ResNeXt101(False)
         aspp_dilate = [12, 24, 36]
         # aspp_dilate = [6, 12, 18]
         self.aspp = ASPP(2048, aspp_dilate)
